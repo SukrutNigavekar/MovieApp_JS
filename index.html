@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+  </head>
+  <body class="bg-gradient-to-r from-sky-500 to-indigo-500">
+    <div class="w-full">
+      <div class="w-[80%] m-auto">
+        <h1 class="text-[45px] block">Movies Center</h1>
+        <input
+          type="text"
+          class="p-2 border border-red-500 rounded w-[25%] mb-3"
+          id="searching"
+        />
+        <div
+          class="w-full border border-{#ccc} p-5 grid lg:grid-cols-4 grid-cols-1 gap-4 my-[30px] rounded-lg"
+          id="movieDiv"
+        ></div>
+        <!-- pagination -->
+        <nav aria-label="Page navigation example" class="pb-[30px] text-center">
+          <ul
+            class="inline-flex -space-x-px text-base h-10"
+            id="pagination"
+          ></ul>
+        </nav>
+      </div>
+    </div>
+  </body>
+  <script>
+    let movieContainer = document.querySelector("#movieDiv");
+    let search = document.querySelector("#searching");
+    let mysearch;
+    let Api;
+
+    function ApiFetch(guestsearch , moviePage) {
+      console.log(moviePage)
+      if (guestsearch == undefined || guestsearch.length == 0) {
+        Api =
+          `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=04c35731a5ee918f014970082a0088b1&page=${moviePage || 1}`;
+      } else {
+        Api = `https://api.themoviedb.org/3/search/movie?&api_key=04c35731a5ee918f014970082a0088b1&query=${guestsearch}`;
+      }
+      fetch(Api)
+        .then((res) => {  
+          return res.json();
+        })
+        .then((ress) => {
+          let apiData = ress.results;
+          movieContainer.innerHTML = "";
+          apiData.map((v, i) => {
+            // console.log(apiData)
+            movieContainer.innerHTML += `
+          <div
+            class="max-w-sm bg-white border border-gray-200 rounded-lg shadow "
+          >
+            <a href="#">
+              <img
+                class="rounded-t-lg mx-auto"
+                src="https://image.tmdb.org/t/p/w1280${v.poster_path}""
+              />
+            </a>
+            <div class="p-5">
+              <a href="#">
+                <h5
+                  class="mb-2 text-2xl font-bold tracking-tight text-gray-500 dark:text-black"
+                >
+              ${v.title}
+                </h5>
+              </a>
+              <p class="mb-3 font-normal text-gray-700 dark:text-gray-600">
+                ${v.release_date}
+              </p>
+              <a
+                href="#"
+                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Read more
+                <svg
+                  class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M1 5h12m0 0L9 1m4 4L9 9"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+          `;
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    ApiFetch();
+
+    search.addEventListener("keyup", (e) => {
+      mysearch = e.target.value;
+      ApiFetch(mysearch);
+    });
+
+    // pagination
+    let pagination = document.querySelector("#pagination");
+    pagination.innerHTML = "";
+    for (var i = 1; i <= 10; i++) {
+      pagination.innerHTML += `<li>
+              
+            <li>
+              <a
+                href="#"
+                class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                onClick={moviePagination(${i})} >${i}</a
+              >
+            </li>
+           `;
+    }
+    function moviePagination(moviePage){
+      ApiFetch(moviePage)
+    }
+  </script>
+</html>
